@@ -94,12 +94,8 @@ services:
     container_name: nginx-proxy
     ports:
       - "80:80"
-      - "443:443"
-      - "3002:3002"  # Direct frontend access (backup)
-      - "4444:4444"   # Direct backend access (backup)
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - /etc/letsencrypt:/etc/letsencrypt:ro
     networks:
       - mynetwork
     depends_on:
