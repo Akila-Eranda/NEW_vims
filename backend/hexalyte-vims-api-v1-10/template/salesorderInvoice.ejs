@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Sales Order Invoice</title>
+  </head>
+  <body style="font-family: 'Arial', sans-serif; padding: 40px; color: #333;">
+    <div style="max-width: 800px; margin: 0 auto; border: 1px solid #ddd; padding: 40px; box-shadow: 0 0 10px rgba(0,0,0,0.05);">
+      
+      <!-- Header -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+        <div>
+          <h2 style="margin: 0; color: #2c3e50;">Hexalyte Pvt Ltd</h2>
+          <p style="margin: 4px 0; font-size: 14px;">123 Tech Street, Kandy, Sri Lanka</p>
+          <p style="margin: 4px 0; font-size: 14px;">Phone: +94 77 123 4567</p>
+        </div>
+        <div style="text-align: right;">
+          <h1 style="margin: 0; color: #2980b9;">INVOICE</h1>
+          <p style="margin: 8px 0;">Order ID: <strong><%= OrderID %></strong></p>
+          <p style="margin: 0;">Date: <%= OrderDate %></p>
+        </div>
+      </div>
+
+      <!-- Customer Info -->
+      <!-- <div style="margin-bottom: 30px;">
+        <h3 style="margin-bottom: 10px; color: #34495e;">Bill To:</h3>
+        <p style="margin: 4px 0;"><strong> NAME </strong></p>
+        <p style="margin: 4px 0;"> EMAIL </p>
+      </div> -->
+
+      <!-- Items Table -->
+      <table width="100%" cellpadding="10" cellspacing="0" style="border-collapse: collapse; margin-bottom: 30px;">
+        <thead>
+          <tr style="background-color: #f8f9fa;">
+            <th align="left" style="border-bottom: 2px solid #ddd;">Product ID</th>
+            <th align="center" style="border-bottom: 2px solid #ddd;">Quantity</th>
+            <th align="right" style="border-bottom: 2px solid #ddd;">Unit Price (LKR)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% items.forEach(item => { %>
+            <tr>
+              <td><%= item.ProductID %></td>
+              <td align="center"><%= item.Quantity %></td>
+              <td align="right"><%= item.UnitPrice %> </td>
+              <td align="right"><%= (item.Quantity * item.UnitPrice) %> </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+
+      <!-- Summary -->
+      <div style="text-align: right;">
+        <h2 style="margin-top: 10px; color: #27ae60;">Grand Total: <%= TotalAmount.toFixed(2) %> (LKR) </h2>
+      </div>
+
+      <!-- Footer -->
+      <div style="border-top: 1px solid #ddd; margin-top: 40px; padding-top: 20px; font-size: 13px; color: #666;">
+        <p>Thank you for your business! If you have any questions, feel free to contact us.</p>
+      </div>
+    </div>
+  </body>
+</html>

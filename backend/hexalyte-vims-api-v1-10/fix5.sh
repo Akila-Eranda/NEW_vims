@@ -1,0 +1,1 @@
+cd /root/vims-docker-full-project/backend/hexalyte-vims-api-v1-10/service && sed -i '117d' user.service.js && sed -n '115,120p' user.service.js

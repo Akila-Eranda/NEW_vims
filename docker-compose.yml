@@ -1,0 +1,116 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-container
+    env_file:
+      - .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "${DB_PORT}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./backup:/var/lib/mysql-files/backup
+    networks:
+      - mynetwork
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 20s
+      retries: 10
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: phpmyadmin-container
+    env_file:
+      - .env
+    environment:
+      PMA_HOST: ${PMA_HOST}
+      PMA_PORT: ${PMA_PORT}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      PMA_FORCE_SSL: 'false'
+      PMA_USER: ${DB_USER}
+      PMA_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "8080:80"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - mynetwork
+
+  backend:
+    build:
+      context: ./backend/hexalyte-vims-api-v1-10
+    container_name: backend-app
+    env_file:
+      - .env
+    networks:
+      - mynetwork
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend/hexalyte-vims-ui-v1-13
+    container_name: frontend-app
+    env_file:
+      - .env
+    networks:
+      - mynetwork
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  backup:
+    build:
+      context: ./backup-service
+    container_name: vims-backup-mailer
+    env_file:
+      - .env
+    volumes:
+      - ./backup:/app/backup
+      - ./logs:/app/logs
+    networks:
+      - mynetwork
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
+    environment:
+      - BACKUP_SCHEDULE=${BACKUP_SCHEDULE:-0 2 * * *}
+      - EMAIL_ENABLED=${EMAIL_ENABLED:-true}
+      - BACKUP_RETENTION_DAYS=${BACKUP_RETENTION_DAYS:-30}
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+      - "3002:3002"  # Direct frontend access (backup)
+      - "4444:4444"   # Direct backend access (backup)
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    networks:
+      - mynetwork
+    depends_on:
+      - frontend
+      - backend
+      - phpmyadmin
+    restart: unless-stopped
+
+networks:
+  mynetwork:
+    driver: bridge
+
+volumes:
+  mysql_data:

@@ -1,0 +1,70 @@
+{
+  "name": "@Hexalyte-technology/hexalyte-vims",
+  "version": "0.0.1",
+  "main": "index.js",
+  "scripts": {
+    "db:setup": "npx sequelize-cli db:create && npx sequelize-cli db:migrate",
+    "start:dev": "pm2 start --env dev",
+    "start:test": "pm2 start --env test",
+    "start:prod": "pm2 start --env prod",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "stop:dev": "pm2 kill"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Hexalyte-technology/hexalyte-vims.git"
+  },
+  "keywords": [
+    "api",
+    "boilerplate",
+    "nodejs",
+    "express",
+    "sequelize",
+    "mysql",
+    "jwt",
+    "swagger",
+    "winston",
+    "pm2",
+    "api-boilerplate",
+    "nodejs-api",
+    "nodejs-sequelize-api"
+  ],
+  "author": "Pasindu Raveen",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Hexalyte-technology/hexalyte-vims/issues"
+  },
+  "homepage": "hexalyte.com",
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "bcryptjs": "^3.0.2",
+    "bluebird": "3.7.2",
+    "body-parser": "1.20.3",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "ejs": "^3.1.10",
+    "exceljs": "^4.4.0",
+    "express": "^5.0.1",
+    "helmet": "^6.2.0",
+    "http-status": "^1.8.1",
+    "joi": "^17.9.1",
+    "jsonwebtoken": "^9.0.2",
+    "moment": "^2.30.1",
+    "morgan": "^1.10.0",
+    "mysql2": "^3.12.0",
+    "nodemailer": "6.9.9",
+    "nodemon": "^3.1.9",
+    "passport": "^0.6.0",
+    "passport-jwt": "^4.0.1",
+    "puppeteer": "^24.6.1",
+    "sequelize": "^6.37.5",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^4.6.2",
+    "winston": "^3.8.2",
+    "xss-clean": "^0.1.4"
+  },
+  "devDependencies": {
+    "sequelize-cli": "^6.6.2"
+  }
+}

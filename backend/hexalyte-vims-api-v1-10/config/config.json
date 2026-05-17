@@ -1,0 +1,29 @@
+{
+  "development": {
+    "username": "admin",
+    "password": "5Y43HF85KGJ2TZ77",
+    "database": "hexa_vims_db_development",
+    "host": "mysql",
+    "port": 3306,
+    "dialect": "mysql",
+    "logging": false
+  },
+  "test": {
+    "username": "admin", 
+    "password": "5Y43HF85KGJ2TZ77",
+    "database": "hexa_vims_db_test",
+    "host": "mysql",
+    "port": 3306,
+    "dialect": "mysql",
+    "logging": false
+  },
+  "production": {
+    "username": "admin",
+    "password": "5Y43HF85KGJ2TZ77",
+    "database": "hexa_vims_db_development",
+    "host": "mysql",
+    "port": 3306,
+    "dialect": "mysql",
+    "logging": false
+  }
+}

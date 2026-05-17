@@ -1,0 +1,14 @@
+﻿VIMS Database Backup Information
+=================================
+Backup Date: 02/25/2026 08:53:43
+Database: hexa_vims_db_development
+Backup File: vims_db_backup_2026-02-25_08-52-59.sql
+Server: 45.8.149.194
+
+To Restore:
+-----------
+# On server:
+docker exec -i mysql-container mysql -u root -p'root123456' hexa_vims_db_development < vims_db_backup_2026-02-25_08-52-59.sql
+
+# Or locally:
+docker exec -i mysql-container mysql -u root -p'root123456' hexa_vims_db_development < vims_db_backup_2026-02-25_08-52-59.sql
