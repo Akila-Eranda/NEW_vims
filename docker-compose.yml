@@ -100,6 +100,7 @@ services:
       - /etc/letsencrypt:/etc/letsencrypt:ro
     networks:
       - mynetwork
+      - hexalyte_hexalyte-network
     depends_on:
       - frontend
       - backend
@@ -109,6 +110,8 @@ services:
 networks:
   mynetwork:
     driver: bridge
+  hexalyte_hexalyte-network:
+    external: true
 
 volumes:
   mysql_data:
