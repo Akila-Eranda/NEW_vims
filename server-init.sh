@@ -9,10 +9,10 @@ set -e
 
 REPO_URL="https://github.com/Akila-Eranda/NEW_vims.git"
 APP_DIR="/opt/vims"
-DOMAIN="YOUR_DOMAIN"         # e.g. example.com  <-- CHANGE THIS
-API_DOMAIN="api.$DOMAIN"
-WS_DOMAIN="ws.$DOMAIN"
-DB_DOMAIN="db.$DOMAIN"
+DOMAIN="test.hexalyte.com"
+API_DOMAIN="api.test.hexalyte.com"
+WS_DOMAIN="api.test.hexalyte.com"
+DB_DOMAIN="db.test.hexalyte.com"
 
 echo "======================================"
 echo "  VIMS Server Initialization"
