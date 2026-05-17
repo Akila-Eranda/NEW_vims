@@ -7,7 +7,7 @@ import checkToken from "api/checkToken";
 import { useHistory } from "react-router-dom/cjs/react-router-dom";
 import { createAxiosInstance } from "api/axiosInstance";
 
-const BASE_URL = "https://api.vims.hexalyte.com/v1/";
+const BASE_URL = "https://api.test.hexalyte.com/v1/";
 
 export default function ImprovedBarChart() {
   const [inventory, setInventory] = useState([]);

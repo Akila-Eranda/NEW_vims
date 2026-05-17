@@ -467,7 +467,7 @@ import NotificationDropdown from "components/Dropdowns/NotificationDropdown.js";
 import UserDropdown from "components/Dropdowns/UserDropdown.js";
 import { getStoredTokens } from "auth/tokenService";
 
-const BASE_URL = "https://api.vims.hexalyte.com/v1/";
+const BASE_URL = "https://api.test.hexalyte.com/v1/";
 
 export default function Sidebar() {
   const [collapseShow, setCollapseShow] = useState("hidden");

@@ -4,7 +4,7 @@ import { useHistory } from "react-router-dom";
 import { useAuth } from "context/AuthContext";
 import Swal from "sweetalert2";
 
-const BASE_URL = "https://api.vims.hexalyte.com/v1/";
+const BASE_URL = "https://api.test.hexalyte.com/v1/";
 
 export default function Register() {
 

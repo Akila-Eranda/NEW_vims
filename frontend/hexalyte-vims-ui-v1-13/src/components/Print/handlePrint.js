@@ -4,7 +4,7 @@ import printHandler from "components/Invoice/PrintReceipt";
 import { createAxiosInstance } from "api/axiosInstance";
 import { printB4Invoice, printThermalSalesOrder } from "./thermalPrint";
 
-const BASE_URL = "https://api.vims.hexalyte.com/v1/";
+const BASE_URL = "https://api.test.hexalyte.com/v1/";
 
 async function handlePrint(row) {
   if (!row.CustomerID) {

@@ -135,7 +135,7 @@ import { createAxiosInstance } from 'api/axiosInstance';
 import axios from 'axios';
 
 const Onboard = () => {
-    const BASE_URL = "https://api.vims.hexalyte.com/v1/";
+    const BASE_URL = "https://api.test.hexalyte.com/v1/";
 
     const [isLoading, setIsLoading] = useState(false);
     const [isRegistered, setIsRegistered] = useState(false);

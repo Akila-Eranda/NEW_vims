@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 
-const BASE_URL = "https://api.vims.hexalyte.com/v1/";
+const BASE_URL = "https://api.test.hexalyte.com/v1/";
 
 const A4PrintInvoice = React.forwardRef(({ order, orderItems }, ref) => {
     const [products, setProducts] = useState([]);

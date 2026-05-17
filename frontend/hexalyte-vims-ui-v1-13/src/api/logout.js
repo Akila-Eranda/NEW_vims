@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "https://api.vims.hexalyte.com/v1/";
+const BASE_URL = "https://api.test.hexalyte.com/v1/";
 
 async function handleUserLogout() {
 
