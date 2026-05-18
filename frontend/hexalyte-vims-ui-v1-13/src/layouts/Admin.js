@@ -40,6 +40,7 @@ import Quotations from "views/admin/Quotations";
 import FleetManagement from "views/admin/FleetManagement";
 import CashBook from "views/admin/CashBook";
 import SalesRepManagement from "views/admin/SalesRepManagement";
+import Sales from "views/admin/Sales";
 
 export default function Admin() {
   return (
@@ -80,7 +81,8 @@ export default function Admin() {
             <Route path="/admin/fleet" exact component={FleetManagement} />
             <Route path="/admin/cashbook" exact component={CashBook} />
             <Route path="/admin/sales-rep" exact component={SalesRepManagement} />
-            <Redirect from="/admin" to="/admin/dashboard" />
+            <Route path="/admin/sales" exact component={Sales} />
+            <Redirect exact from="/admin" to="/admin/dashboard" />
           </Switch>
           <FooterAdmin />
         </div>
