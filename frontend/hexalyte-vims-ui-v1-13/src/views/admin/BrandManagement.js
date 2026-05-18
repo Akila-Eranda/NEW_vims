@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
-import DataTable from "react-data-table-component";
+import React, { useEffect, useState, useMemo } from "react";
+import { createColumnHelper } from "@tanstack/react-table";
+import TanStackTable from "components/Table/TanStackTable";
 import Swal from "sweetalert2";
 import { motion } from "framer-motion";
 import { createAxiosInstance } from "api/axiosInstance";
@@ -10,7 +11,6 @@ function BrandManagement() {
   const [showModal, setShowModal] = useState(false);
   const [editBrand, setEditBrand] = useState(null);
   const [form, setForm] = useState({ Name: "", Description: "" });
-  const [searchQuery, setSearchQuery] = useState("");
   const [errors, setErrors] = useState({});
 
   async function loadBrands() {
@@ -97,128 +97,82 @@ function BrandManagement() {
     });
   }
 
-  const filteredBrands = brands.filter(b =>
-    (b.Name && b.Name.toLowerCase().includes(searchQuery.toLowerCase())) ||
-    (b.Description && b.Description.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  const columnHelper = useMemo(() => createColumnHelper(), []);
 
-  const customStyles = {
-    headRow: {
-      style: {
-        backgroundColor: "#f9fafb",
-        borderRadius: "8px 8px 0 0",
-        border: "none",
-        minHeight: "56px",
-      },
-    },
-    headCells: {
-      style: {
-        color: "#4b5563",
-        fontSize: "14px",
-        fontWeight: "600",
-        paddingLeft: "16px",
-        paddingRight: "16px",
-      },
-    },
-    rows: {
-      style: {
-        fontSize: "14px",
-        minHeight: "60px",
-        borderBottom: "1px solid #f3f4f6",
-        "&:last-of-type": { borderBottom: "none" },
-      },
-      highlightOnHoverStyle: {
-        backgroundColor: "#f3f4f6",
-        cursor: "pointer",
-        transitionDuration: "0.15s",
-        transitionProperty: "background-color",
-        borderBottomColor: "#f3f4f6",
-        outlineColor: "transparent",
-      },
-    },
-    pagination: {
-      style: {
-        border: "none",
-        backgroundColor: "#fff",
-        borderRadius: "0 0 8px 8px",
-        boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
-      },
-    },
-  };
-
-  const columns = [
-    {
-      name: "ID",
-      selector: row => row.BrandID,
-      sortable: true,
-      width: "80px",
-      style: { fontWeight: 600, color: "#1f2937" },
-    },
-    {
-      name: "Brand",
-      cell: row => (
-        <div className="flex items-center py-2">
-          <div className="h-10 w-10 flex-shrink-0 rounded-md bg-gradient-to-r from-purple-100 to-pink-100 flex items-center justify-center text-purple-700 font-bold text-lg border border-purple-200">
-            {row.Name ? row.Name.charAt(0).toUpperCase() : "B"}
-          </div>
-          <div className="ml-4">
-            <div className="font-medium text-gray-900">{row.Name}</div>
-            <div className="text-gray-500 text-sm truncate max-w-xs">
-              {row.Description || "No description"}
+  const columns = useMemo(() => [
+    columnHelper.accessor("BrandID", {
+      header: "ID",
+      size: 70,
+      cell: info => <span className="font-semibold text-gray-700">#{info.getValue()}</span>,
+    }),
+    columnHelper.accessor("Name", {
+      header: "Brand",
+      cell: info => {
+        const row = info.row.original;
+        return (
+          <div className="flex items-center py-1">
+            <div className="h-10 w-10 flex-shrink-0 rounded-md bg-gradient-to-r from-purple-100 to-pink-100 flex items-center justify-center text-purple-700 font-bold text-lg border border-purple-200">
+              {row.Name ? row.Name.charAt(0).toUpperCase() : "B"}
+            </div>
+            <div className="ml-4">
+              <div className="font-medium text-gray-900">{row.Name}</div>
+              <div className="text-gray-500 text-sm truncate max-w-xs">{row.Description || "No description"}</div>
             </div>
           </div>
-        </div>
-      ),
-      sortable: true,
-      sortFunction: (a, b) => a.Name.localeCompare(b.Name),
-      grow: 3,
-    },
-    {
-      name: "Products",
-      cell: row => (
+        );
+      },
+    }),
+    columnHelper.accessor(row => row.products?.length || 0, {
+      id: "products",
+      header: "Products",
+      size: 120,
+      cell: info => (
         <span className="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-          {row.products?.length || 0} products
+          {info.getValue()} products
         </span>
       ),
-      width: "130px",
-    },
-    {
-      name: "Status",
-      cell: row => (
-        <span className={`px-3 py-1 rounded-full text-xs font-medium ${row.isActive !== false ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}`}>
-          {row.isActive !== false ? "Active" : "Inactive"}
+    }),
+    columnHelper.accessor("isActive", {
+      header: "Status",
+      size: 110,
+      cell: info => (
+        <span className={`px-3 py-1 rounded-full text-xs font-medium ${info.getValue() !== false ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}`}>
+          {info.getValue() !== false ? "Active" : "Inactive"}
         </span>
       ),
-      width: "110px",
-    },
-    {
-      name: "Actions",
-      cell: row => (
-        <div className="flex space-x-2">
-          <button
-            className="bg-indigo-500 text-white rounded-full p-2 hover:bg-indigo-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:ring-opacity-50"
-            onClick={(e) => { e.stopPropagation(); openEdit(row); }}
-            title="Edit Brand"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-            </svg>
-          </button>
-          <button
-            className="bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-300 focus:ring-opacity-50"
-            onClick={(e) => { e.stopPropagation(); handleDelete(row); }}
-            title="Delete Brand"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-            </svg>
-          </button>
-        </div>
-      ),
-      button: true,
-      width: "120px",
-    },
-  ];
+    }),
+    columnHelper.display({
+      id: "actions",
+      header: "Actions",
+      size: 110,
+      enableSorting: false,
+      cell: info => {
+        const row = info.row.original;
+        return (
+          <div className="flex space-x-2">
+            <button
+              className="bg-indigo-500 text-white rounded-full p-2 hover:bg-indigo-600 transition-colors duration-200"
+              onClick={e => { e.stopPropagation(); openEdit(row); }}
+              title="Edit Brand"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+              </svg>
+            </button>
+            <button
+              className="bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors duration-200"
+              onClick={e => { e.stopPropagation(); handleDelete(row); }}
+              title="Delete Brand"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+          </div>
+        );
+      },
+    }),
+  ], [brands]);
 
   return (
     <>
@@ -240,35 +194,6 @@ function BrandManagement() {
               </svg>
               Add New Brand
             </button>
-          </div>
-
-          {/* Search Bar */}
-          <div className="bg-white p-4 rounded-lg shadow-sm mb-4">
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="relative flex-grow">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <input
-                  type="text"
-                  className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
-                  placeholder="Search brands by name or description"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-              <button
-                onClick={loadBrands}
-                className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="-ml-0.5 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-                Refresh
-              </button>
-            </div>
           </div>
 
           {/* Summary Cards */}
@@ -312,8 +237,8 @@ function BrandManagement() {
                     </svg>
                   </div>
                   <div className="ml-5">
-                    <p className="text-sm font-medium text-gray-500">Search Results</p>
-                    <h3 className="mt-1 text-xl font-semibold text-gray-900">{filteredBrands.length}</h3>
+                    <p className="text-sm font-medium text-gray-500">With Products</p>
+                    <h3 className="mt-1 text-xl font-semibold text-gray-900">{brands.filter(b => b.products?.length > 0).length}</h3>
                   </div>
                 </div>
               </div>
@@ -321,33 +246,15 @@ function BrandManagement() {
           </div>
 
           {/* Data Table */}
-          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-            <DataTable
-              columns={columns}
-              data={filteredBrands}
-              customStyles={customStyles}
-              highlightOnHover
-              pointerOnHover
-              pagination
-              paginationPerPage={10}
-              paginationRowsPerPageOptions={[5, 10, 15, 20, 25]}
-              progressPending={isLoading}
-              progressComponent={
-                <div className="flex justify-center items-center h-64">
-                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-                </div>
-              }
-              noDataComponent={
-                <div className="flex flex-col items-center justify-center p-10 text-center">
-                  <svg className="w-16 h-16 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                  </svg>
-                  <p className="mt-4 text-lg font-medium text-gray-500">No brands found</p>
-                  <p className="mt-1 text-sm text-gray-400">Try adjusting your search or add a new brand</p>
-                </div>
-              }
-            />
-          </div>
+          <TanStackTable
+            columns={columns}
+            data={brands}
+            isLoading={isLoading}
+            searchPlaceholder="Search brands by name or description..."
+            noDataMessage="No brands found"
+            noDataSubMessage="Try adjusting your search or add a new brand"
+            onRefresh={loadBrands}
+          />
 
         </div>
       </div>

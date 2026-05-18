@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
-import DataTable from "react-data-table-component";
+import React, { useEffect, useState, useMemo } from "react";
+import { createColumnHelper } from "@tanstack/react-table";
+import TanStackTable from "components/Table/TanStackTable";
 import Swal from "sweetalert2";
 import { motion } from "framer-motion";
 import { createAxiosInstance } from "api/axiosInstance";
@@ -121,85 +122,67 @@ function BatchTracking() {
     });
   }
 
-  const customStyles = {
-    headRow: {
-      style: { backgroundColor: "#f9fafb", borderRadius: "8px 8px 0 0", border: "none", minHeight: "56px" },
-    },
-    headCells: {
-      style: { color: "#4b5563", fontSize: "14px", fontWeight: "600", paddingLeft: "16px", paddingRight: "16px" },
-    },
-    rows: {
-      style: { fontSize: "14px", minHeight: "60px", borderBottom: "1px solid #f3f4f6" },
-      highlightOnHoverStyle: {
-        backgroundColor: "#f3f4f6", cursor: "pointer", transitionDuration: "0.15s",
-        transitionProperty: "background-color", borderBottomColor: "#f3f4f6", outlineColor: "transparent",
-      },
-    },
-    pagination: {
-      style: { border: "none", backgroundColor: "#fff", borderRadius: "0 0 8px 8px", boxShadow: "0 1px 2px 0 rgba(0,0,0,0.05)" },
-    },
-  };
+  const columnHelper = useMemo(() => createColumnHelper(), []);
 
-  const columns = [
-    {
-      name: "Batch",
-      cell: row => (
-        <div className="flex items-center py-2">
-          <div className="h-10 w-10 flex-shrink-0 rounded-md bg-gradient-to-r from-orange-100 to-yellow-100 flex items-center justify-center text-orange-700 font-bold text-sm border border-orange-200">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-            </svg>
+  const columns = useMemo(() => [
+    columnHelper.accessor("BatchNumber", {
+      header: "Batch",
+      cell: info => {
+        const row = info.row.original;
+        return (
+          <div className="flex items-center py-1">
+            <div className="h-10 w-10 flex-shrink-0 rounded-md bg-gradient-to-r from-orange-100 to-yellow-100 flex items-center justify-center text-orange-700 border border-orange-200">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+              </svg>
+            </div>
+            <div className="ml-4">
+              <div className="font-semibold text-gray-900 font-mono">{row.BatchNumber}</div>
+              <div className="text-gray-500 text-sm">{row.product?.Name || "—"}</div>
+            </div>
           </div>
-          <div className="ml-4">
-            <div className="font-semibold text-gray-900 font-mono">{row.BatchNumber}</div>
-            <div className="text-gray-500 text-sm">{row.product?.Name || "—"}</div>
-          </div>
-        </div>
-      ),
-      sortable: true,
-      sortFunction: (a, b) => a.BatchNumber.localeCompare(b.BatchNumber),
-      grow: 2,
-    },
-    {
-      name: "Quantity",
-      cell: row => (
+        );
+      },
+    }),
+    columnHelper.accessor("Quantity", {
+      header: "Quantity",
+      size: 120,
+      cell: info => (
         <span className="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-          {row.Quantity} units
+          {info.getValue()} units
         </span>
       ),
-      width: "120px",
-    },
-    {
-      name: "Mfg Date",
-      selector: row => row.ManufactureDate ? new Date(row.ManufactureDate).toLocaleDateString() : "—",
-      sortable: true,
-      style: { color: "#6b7280" },
-    },
-    {
-      name: "Expiry Date",
-      selector: row => row.ExpiryDate ? new Date(row.ExpiryDate).toLocaleDateString() : "—",
-      sortable: true,
-      style: { fontWeight: 500, color: "#1f2937" },
-    },
-    {
-      name: "Status",
-      cell: row => <ExpiryBadge date={row.ExpiryDate} />,
-      width: "130px",
-    },
-    {
-      name: "Buying Price",
-      selector: row => row.BuyingPrice
-        ? new Intl.NumberFormat("en-LK", { style: "currency", currency: "LKR", minimumFractionDigits: 2 }).format(row.BuyingPrice)
+    }),
+    columnHelper.accessor("ManufactureDate", {
+      header: "Mfg Date",
+      cell: info => <span className="text-gray-500">{info.getValue() ? new Date(info.getValue()).toLocaleDateString() : "—"}</span>,
+    }),
+    columnHelper.accessor("ExpiryDate", {
+      header: "Expiry Date",
+      cell: info => <span className="font-medium text-gray-800">{info.getValue() ? new Date(info.getValue()).toLocaleDateString() : "—"}</span>,
+    }),
+    columnHelper.accessor("ExpiryDate", {
+      id: "status",
+      header: "Status",
+      size: 130,
+      enableSorting: false,
+      cell: info => <ExpiryBadge date={info.getValue()} />,
+    }),
+    columnHelper.accessor("BuyingPrice", {
+      header: "Buying Price",
+      cell: info => info.getValue()
+        ? <span className="text-green-700 font-medium">{new Intl.NumberFormat("en-LK", { style: "currency", currency: "LKR", minimumFractionDigits: 2 }).format(info.getValue())}</span>
         : <span className="text-gray-300 text-xs">—</span>,
-      sortable: true,
-      style: { color: "#059669" },
-    },
-    {
-      name: "Actions",
-      cell: row => (
+    }),
+    columnHelper.display({
+      id: "actions",
+      header: "Actions",
+      size: 80,
+      enableSorting: false,
+      cell: info => (
         <button
-          className="bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-300 focus:ring-opacity-50"
-          onClick={(e) => { e.stopPropagation(); handleDelete(row); }}
+          className="bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors duration-200"
+          onClick={e => { e.stopPropagation(); handleDelete(info.row.original); }}
           title="Delete Batch"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -207,10 +190,8 @@ function BatchTracking() {
           </svg>
         </button>
       ),
-      button: true,
-      width: "80px",
-    },
-  ];
+    }),
+  ], [batches]);
 
   const expiredCount = batches.filter(b => getDaysToExpiry(b.ExpiryDate) !== null && getDaysToExpiry(b.ExpiryDate) < 0).length;
   const criticalCount = batches.filter(b => { const d = getDaysToExpiry(b.ExpiryDate); return d !== null && d >= 0 && d <= 7; }).length;
@@ -350,35 +331,15 @@ function BatchTracking() {
           </div>
 
           {/* Data Table */}
-          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-            <DataTable
-              columns={columns}
-              data={batches}
-              customStyles={customStyles}
-              highlightOnHover
-              pointerOnHover
-              pagination
-              paginationPerPage={10}
-              paginationRowsPerPageOptions={[5, 10, 15, 20, 25]}
-              progressPending={isLoading}
-              progressComponent={
-                <div className="flex justify-center items-center h-64">
-                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-                </div>
-              }
-              noDataComponent={
-                <div className="flex flex-col items-center justify-center p-10 text-center">
-                  <svg className="w-16 h-16 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                  </svg>
-                  <p className="mt-4 text-lg font-medium text-gray-500">No batches found</p>
-                  <p className="mt-1 text-sm text-gray-400">
-                    {tab === "product" && !selectedProduct ? "Select a product to view its batches" : "Try adjusting your filter or add a new batch"}
-                  </p>
-                </div>
-              }
-            />
-          </div>
+          <TanStackTable
+            columns={columns}
+            data={batches}
+            isLoading={isLoading}
+            searchPlaceholder="Search by batch number or product..."
+            noDataMessage="No batches found"
+            noDataSubMessage={tab === "product" && !selectedProduct ? "Select a product to view its batches" : "Try adjusting your filter or add a new batch"}
+            onRefresh={tab === "expiring" ? loadExpiring : loadByProduct}
+          />
 
         </div>
       </div>
