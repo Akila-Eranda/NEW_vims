@@ -240,52 +240,52 @@ function BatchTracking() {
 
           {/* Tabs & Filters */}
           <div className="bg-white p-4 rounded-lg shadow-sm mb-4">
-            <div className="flex flex-col md:flex-row gap-4 items-start md:items-center">
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setTab("expiring")}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${tab === "expiring" ? "bg-orange-500 text-white shadow-sm" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
-                >
-                  Expiring Soon
-                </button>
-                <button
-                  onClick={() => setTab("product")}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${tab === "product" ? "bg-blue-600 text-white shadow-sm" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
-                >
-                  By Product
-                </button>
-              </div>
-
-              {tab === "expiring" && (
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-sm text-gray-500">Expiring within:</span>
-                  {[7, 14, 30, 60, 90].map(d => (
-                    <button
-                      key={d}
-                      onClick={() => setDaysFilter(d)}
-                      className={`px-3 py-1 rounded-full text-xs font-medium transition-colors duration-200 ${daysFilter === d ? "bg-orange-500 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
-                    >
-                      {d} days
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {tab === "product" && (
-                <select
-                  value={selectedProduct}
-                  onChange={e => setSelectedProduct(e.target.value)}
-                  className="block pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
-                >
-                  <option value="">Select Product...</option>
-                  {products.map(p => (
-                    <option key={p.ProductID} value={p.ProductID}>
-                      {p.Name}{p.SKU ? ` (${p.SKU})` : ""}
-                    </option>
-                  ))}
-                </select>
-              )}
+            {/* Tab Buttons Row */}
+            <div className="flex gap-2 mb-3">
+              <button
+                onClick={() => setTab("expiring")}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${tab === "expiring" ? "bg-orange-500 text-white shadow-sm" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
+              >
+                Expiring Soon
+              </button>
+              <button
+                onClick={() => setTab("product")}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${tab === "product" ? "bg-blue-600 text-white shadow-sm" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
+              >
+                By Product
+              </button>
             </div>
+
+            {/* Filter Row */}
+            {tab === "expiring" && (
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-sm text-gray-500 mr-1">Expiring within:</span>
+                {[7, 14, 30, 60, 90].map(d => (
+                  <button
+                    key={d}
+                    onClick={() => setDaysFilter(d)}
+                    className={`px-3 py-1 rounded-full text-xs font-medium transition-colors duration-200 ${daysFilter === d ? "bg-orange-500 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
+                  >
+                    {d} days
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {tab === "product" && (
+              <select
+                value={selectedProduct}
+                onChange={e => setSelectedProduct(e.target.value)}
+                className="block pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+              >
+                <option value="">Select Product...</option>
+                {products.map(p => (
+                  <option key={p.ProductID} value={p.ProductID}>
+                    {p.Name}{p.SKU ? ` (${p.SKU})` : ""}
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
 
           {/* Summary Cards */}
