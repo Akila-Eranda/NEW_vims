@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
 import Swal from "sweetalert2";
+import { motion } from "framer-motion";
 import { createAxiosInstance } from "api/axiosInstance";
 
 function BrandManagement() {
@@ -10,6 +11,7 @@ function BrandManagement() {
   const [editBrand, setEditBrand] = useState(null);
   const [form, setForm] = useState({ Name: "", Description: "" });
   const [searchQuery, setSearchQuery] = useState("");
+  const [errors, setErrors] = useState({});
 
   async function loadBrands() {
     try {
@@ -29,20 +31,33 @@ function BrandManagement() {
   const openAdd = () => {
     setEditBrand(null);
     setForm({ Name: "", Description: "" });
+    setErrors({});
     setShowModal(true);
   };
 
   const openEdit = (b) => {
     setEditBrand(b);
     setForm({ Name: b.Name, Description: b.Description || "" });
+    setErrors({});
     setShowModal(true);
   };
 
-  async function handleSave() {
-    if (!form.Name.trim()) {
-      Swal.fire({ title: "Warning", text: "Brand name is required", icon: "warning" });
-      return;
+  const handleChange = (e) => {
+    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    if (errors[e.target.name]) {
+      setErrors(prev => ({ ...prev, [e.target.name]: null }));
     }
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    if (!form.Name.trim()) newErrors.Name = "Brand name is required";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  async function handleSave() {
+    if (!validateForm()) return;
     try {
       const api = createAxiosInstance();
       if (editBrand) {
@@ -339,27 +354,41 @@ function BrandManagement() {
 
       {/* Add / Edit Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-          <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onClick={() => setShowModal(false)} />
-            <span className="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
-            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                <div className="flex items-center mb-4">
-                  <div className="flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-purple-100">
-                    <svg className="h-6 w-6 text-purple-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                    </svg>
-                  </div>
-                  <div className="ml-4">
-                    <h3 className="text-lg leading-6 font-medium text-gray-900">
-                      {editBrand ? "Edit Brand" : "Add New Brand"}
-                    </h3>
-                    <p className="text-sm text-gray-500">
-                      {editBrand ? `Editing: ${editBrand.Name}` : "Create a new product brand"}
-                    </p>
-                  </div>
-                </div>
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50 p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3 }}
+            className="relative w-11/12 lg:w-1/2 my-6 mx-auto max-w-2xl"
+          >
+            <div className="bg-white rounded-xl shadow-2xl overflow-hidden">
+
+              {/* Header */}
+              <div className="bg-gradient-to-r from-blue-600 to-indigo-700 px-6 py-4 flex items-center justify-between">
+                <h3 className="text-2xl font-bold text-white flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                  </svg>
+                  {editBrand ? "Edit Brand" : "Add New Brand"}
+                </h3>
+                <button
+                  className="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-2 transition-all duration-200"
+                  onClick={() => setShowModal(false)}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Content */}
+              <div className="p-6">
+                <h4 className="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Brand Information
+                </h4>
 
                 <div className="space-y-4">
                   <div>
@@ -368,41 +397,54 @@ function BrandManagement() {
                     </label>
                     <input
                       type="text"
+                      name="Name"
                       value={form.Name}
-                      onChange={e => setForm({ ...form, Name: e.target.value })}
-                      className="focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                      onChange={handleChange}
+                      className={`block w-full px-3 py-2.5 text-base border ${errors.Name ? "border-red-500" : "border-gray-300"} focus:outline-none focus:ring-blue-500 focus:border-blue-500 rounded-lg transition duration-200 bg-white`}
                       placeholder="e.g. Anchor, Nestlé, Milo"
                     />
+                    {errors.Name && (
+                      <p className="text-red-500 text-xs mt-1">{errors.Name}</p>
+                    )}
                   </div>
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
                     <textarea
+                      name="Description"
                       value={form.Description}
-                      onChange={e => setForm({ ...form, Description: e.target.value })}
-                      rows={3}
-                      className="focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                      placeholder="Optional brand description..."
+                      onChange={handleChange}
+                      rows={4}
+                      className="block w-full px-3 py-2.5 text-base border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 rounded-lg transition duration-200 bg-white"
+                      placeholder="Enter a short description about this brand (optional)"
                     />
                   </div>
                 </div>
               </div>
 
-              <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse gap-2">
+              {/* Footer */}
+              <div className="bg-gray-50 px-6 py-4 flex items-center justify-end space-x-3 border-t">
                 <button
-                  onClick={handleSave}
-                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
-                >
-                  {editBrand ? "Update Brand" : "Add Brand"}
-                </button>
-                <button
+                  type="button"
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white hover:bg-gray-100 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200"
                   onClick={() => setShowModal(false)}
-                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:w-auto sm:text-sm"
                 >
                   Cancel
                 </button>
+                <button
+                  type="button"
+                  className="px-6 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200 flex items-center"
+                  onClick={handleSave}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  {editBrand ? "Update Brand" : "Add Brand"}
+                </button>
               </div>
+
             </div>
-          </div>
+          </motion.div>
         </div>
       )}
     </>
