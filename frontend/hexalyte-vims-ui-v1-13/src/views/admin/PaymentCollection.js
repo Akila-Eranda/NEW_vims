@@ -357,9 +357,16 @@ export default function PaymentCollection() {
 
               {/* Modal Body */}
               <form onSubmit={handleSubmit}>
-                <div className="p-6 space-y-4">
+                <div className="p-6 space-y-5 overflow-y-auto max-h-[70vh]">
 
-                  {/* Sales Order */}
+                  {/* Section: Order */}
+                  <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wide flex items-center gap-2">
+                    <svg className="w-4 h-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                    Order Details
+                  </h4>
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Sales Order <span className="text-red-500">*</span>
@@ -378,6 +385,14 @@ export default function PaymentCollection() {
                       ))}
                     </select>
                   </div>
+
+                  {/* Section: Payment Info */}
+                  <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wide flex items-center gap-2 pt-1">
+                    <svg className="w-4 h-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    Payment Info
+                  </h4>
 
                   {/* Amount + Mode row */}
                   <div className="grid grid-cols-2 gap-4">
@@ -454,8 +469,13 @@ export default function PaymentCollection() {
 
                   {/* Amount preview */}
                   {form.Amount && (
-                    <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-3 flex items-center justify-between">
-                      <span className="text-sm font-medium text-green-700">Payment Amount</span>
+                    <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <svg className="w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span className="text-sm font-medium text-green-700">Payment Amount</span>
+                      </div>
                       <span className="text-lg font-bold text-green-800">{Number(form.Amount).toLocaleString()} LKR</span>
                     </div>
                   )}
