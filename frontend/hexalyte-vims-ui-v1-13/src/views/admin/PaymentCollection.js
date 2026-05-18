@@ -336,7 +336,7 @@ export default function PaymentCollection() {
             initial={{ opacity: 0, scale: 0.95, y: -10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 0.25 }}
-            className="relative w-full max-w-lg"
+            className="relative w-full max-w-md"
           >
             <div className="bg-white rounded-xl shadow-2xl overflow-hidden">
 
