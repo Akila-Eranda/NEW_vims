@@ -205,7 +205,7 @@ function BatchTracking() {
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Batch & Expiry Tracking</h1>
+              <h1 className="text-3xl font-bold text-gray-900">Batch &amp; Expiry Tracking</h1>
               <p className="mt-1 text-sm text-gray-500">Track product batches, manufacture and expiry dates</p>
             </div>
             <button
@@ -219,109 +219,171 @@ function BatchTracking() {
             </button>
           </div>
 
-          {/* Tabs & Filters */}
-          <div className="bg-white p-4 rounded-lg shadow-sm mb-4">
-            {/* Tab Buttons Row */}
-            <div className="flex gap-2 mb-3">
-              <button
-                onClick={() => setTab("expiring")}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${tab === "expiring" ? "bg-orange-500 text-white shadow-sm" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
-              >
-                Expiring Soon
-              </button>
-              <button
-                onClick={() => setTab("product")}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${tab === "product" ? "bg-blue-600 text-white shadow-sm" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
-              >
-                By Product
-              </button>
+          {/* Search & Filter Bar */}
+          <div className="bg-white p-4 rounded-lg shadow-sm mb-0">
+            <div className="flex flex-col lg:flex-row gap-4">
+
+              {/* Tab toggle */}
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setTab("expiring")}
+                  className={`inline-flex items-center px-3 py-2 border shadow-sm text-sm leading-4 font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 ${
+                    tab === "expiring" ? "bg-orange-500 border-orange-500 text-white" : "border-gray-300 text-gray-700 bg-white hover:bg-gray-50"
+                  }`}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="-ml-0.5 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Expiring Soon
+                </button>
+                <button
+                  onClick={() => setTab("product")}
+                  className={`inline-flex items-center px-3 py-2 border shadow-sm text-sm leading-4 font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
+                    tab === "product" ? "bg-blue-600 border-blue-600 text-white" : "border-gray-300 text-gray-700 bg-white hover:bg-gray-50"
+                  }`}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="-ml-0.5 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                  </svg>
+                  By Product
+                </button>
+              </div>
+
+              {/* By-product select */}
+              {tab === "product" && (
+                <div className="flex-grow">
+                  <select
+                    value={selectedProduct}
+                    onChange={e => setSelectedProduct(e.target.value)}
+                    className="focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                  >
+                    <option value="">Select Product...</option>
+                    {products.map(p => (
+                      <option key={p.ProductID} value={p.ProductID}>
+                        {p.Name}{p.SKU ? ` (${p.SKU})` : ""}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              <div className="flex items-center gap-2 flex-wrap flex-1">
+                {/* Days pills (expiring tab only) */}
+                {tab === "expiring" && (
+                  <>
+                    <span className="text-sm text-gray-500 whitespace-nowrap">Expiring within:</span>
+                    {[7, 14, 30, 60, 90].map(d => (
+                      <button
+                        key={d}
+                        onClick={() => setDaysFilter(d)}
+                        className={`px-3 py-1.5 border shadow-sm text-xs font-medium rounded-md transition-colors duration-200 ${
+                          daysFilter === d ? "bg-orange-500 border-orange-500 text-white" : "border-gray-300 text-gray-700 bg-white hover:bg-gray-50"
+                        }`}
+                      >
+                        {d} days
+                      </button>
+                    ))}
+                  </>
+                )}
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => { setTab("expiring"); setDaysFilter(30); setSelectedProduct(""); }}
+                  className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                  title="Clear all filters"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="-ml-0.5 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  Clear
+                </button>
+                <button
+                  onClick={tab === "expiring" ? loadExpiring : loadByProduct}
+                  className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="-ml-0.5 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  Refresh
+                </button>
+              </div>
             </div>
 
-            {/* Filter Row */}
-            {tab === "expiring" && (
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-sm text-gray-500 mr-1">Expiring within:</span>
-                {[7, 14, 30, 60, 90].map(d => (
-                  <button
-                    key={d}
-                    onClick={() => setDaysFilter(d)}
-                    className={`px-3 py-1 rounded-full text-xs font-medium transition-colors duration-200 ${daysFilter === d ? "bg-orange-500 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
-                  >
-                    {d} days
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {tab === "product" && (
-              <select
-                value={selectedProduct}
-                onChange={e => setSelectedProduct(e.target.value)}
-                className="block pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
-              >
-                <option value="">Select Product...</option>
-                {products.map(p => (
-                  <option key={p.ProductID} value={p.ProductID}>
-                    {p.Name}{p.SKU ? ` (${p.SKU})` : ""}
-                  </option>
-                ))}
-              </select>
-            )}
+            {/* Active filters display */}
+            <div className="mt-3 flex flex-wrap gap-2">
+              <span className="text-sm text-gray-500">Active filters:</span>
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                View: {tab === "expiring" ? "Expiring Soon" : "By Product"}
+              </span>
+              {tab === "expiring" && (
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                  Within {daysFilter} days
+                </span>
+              )}
+              {tab === "product" && selectedProduct && (
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                  Product: {products.find(p => String(p.ProductID) === String(selectedProduct))?.Name || selectedProduct}
+                  <button onClick={() => setSelectedProduct("")} className="ml-1 text-green-600 hover:text-green-800">×</button>
+                </span>
+              )}
+            </div>
           </div>
 
           {/* Summary Cards */}
-          <div className="px-0 py-4 bg-gray-50 rounded-lg border border-gray-200 mb-4">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 px-4">
-              <div className="bg-white rounded-lg shadow-sm p-5">
+          <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div className="bg-white rounded-lg shadow-sm p-6">
                 <div className="flex items-center">
                   <div className="flex-shrink-0 p-3 rounded-md bg-blue-100">
                     <svg className="h-6 w-6 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                     </svg>
                   </div>
-                  <div className="ml-4">
+                  <div className="ml-5">
                     <p className="text-sm font-medium text-gray-500">Total Batches</p>
                     <h3 className="mt-1 text-xl font-semibold text-gray-900">{batches.length}</h3>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white rounded-lg shadow-sm p-5">
+              <div className="bg-white rounded-lg shadow-sm p-6">
                 <div className="flex items-center">
                   <div className="flex-shrink-0 p-3 rounded-md bg-red-100">
                     <svg className="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
                   </div>
-                  <div className="ml-4">
+                  <div className="ml-5">
                     <p className="text-sm font-medium text-gray-500">Expired</p>
                     <h3 className="mt-1 text-xl font-semibold text-red-600">{expiredCount}</h3>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white rounded-lg shadow-sm p-5">
+              <div className="bg-white rounded-lg shadow-sm p-6">
                 <div className="flex items-center">
                   <div className="flex-shrink-0 p-3 rounded-md bg-orange-100">
                     <svg className="h-6 w-6 text-orange-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
-                  <div className="ml-4">
+                  <div className="ml-5">
                     <p className="text-sm font-medium text-gray-500">Critical (≤7 days)</p>
                     <h3 className="mt-1 text-xl font-semibold text-orange-600">{criticalCount}</h3>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white rounded-lg shadow-sm p-5">
+              <div className="bg-white rounded-lg shadow-sm p-6">
                 <div className="flex items-center">
                   <div className="flex-shrink-0 p-3 rounded-md bg-green-100">
                     <svg className="h-6 w-6 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
-                  <div className="ml-4">
+                  <div className="ml-5">
                     <p className="text-sm font-medium text-gray-500">Safe (&gt;30 days)</p>
                     <h3 className="mt-1 text-xl font-semibold text-green-600">{safeCount}</h3>
                   </div>
@@ -331,15 +393,17 @@ function BatchTracking() {
           </div>
 
           {/* Data Table */}
-          <TanStackTable
-            columns={columns}
-            data={batches}
-            isLoading={isLoading}
-            searchPlaceholder="Search by batch number or product..."
-            noDataMessage="No batches found"
-            noDataSubMessage={tab === "product" && !selectedProduct ? "Select a product to view its batches" : "Try adjusting your filter or add a new batch"}
-            onRefresh={tab === "expiring" ? loadExpiring : loadByProduct}
-          />
+          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+            <TanStackTable
+              columns={columns}
+              data={batches}
+              isLoading={isLoading}
+              searchPlaceholder="Search by batch number or product..."
+              noDataMessage="No batches found"
+              noDataSubMessage={tab === "product" && !selectedProduct ? "Select a product to view its batches" : "Try adjusting your filter or add a new batch"}
+              onRefresh={tab === "expiring" ? loadExpiring : loadByProduct}
+            />
+          </div>
 
         </div>
       </div>
