@@ -4,6 +4,8 @@ import {
   getCoreRowModel,
   getSortedRowModel,
   getFilteredRowModel,
+  getFacetedRowModel,
+  getFacetedUniqueValues,
   getPaginationRowModel,
   flexRender,
 } from "@tanstack/react-table";
@@ -17,27 +19,52 @@ function TanStackTable({
   noDataSubMessage = "Try adjusting your search or add a new entry",
   onRefresh,
   extraFilters,
+  filterableColumns = [],
 }) {
   const [globalFilter, setGlobalFilter] = useState("");
   const [sorting, setSorting] = useState([]);
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
   const [columnVisibility, setColumnVisibility] = useState({});
   const [showColumnMenu, setShowColumnMenu] = useState(false);
+  const [columnFilters, setColumnFilters] = useState([]);
+  const [openFilterId, setOpenFilterId] = useState(null);
 
   const table = useReactTable({
     data: useMemo(() => data, [data]),
     columns,
-    state: { globalFilter, sorting, pagination, columnVisibility },
+    state: { globalFilter, sorting, pagination, columnVisibility, columnFilters },
     onGlobalFilterChange: setGlobalFilter,
     onSortingChange: setSorting,
     onPaginationChange: setPagination,
     onColumnVisibilityChange: setColumnVisibility,
+    onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    getFacetedRowModel: getFacetedRowModel(),
+    getFacetedUniqueValues: getFacetedUniqueValues(),
     getPaginationRowModel: getPaginationRowModel(),
     globalFilterFn: "includesString",
   });
+
+  const getActiveFilterValues = (colId) => {
+    const f = columnFilters.find(f => f.id === colId);
+    return f ? (Array.isArray(f.value) ? f.value : [f.value]) : [];
+  };
+
+  const toggleFilterValue = (colId, value) => {
+    setColumnFilters(prev => {
+      const existing = prev.find(f => f.id === colId);
+      const current = existing ? (Array.isArray(existing.value) ? existing.value : [existing.value]) : [];
+      const updated = current.includes(value) ? current.filter(v => v !== value) : [...current, value];
+      if (updated.length === 0) return prev.filter(f => f.id !== colId);
+      return [...prev.filter(f => f.id !== colId), { id: colId, value: updated }];
+    });
+  };
+
+  const clearFilter = (colId) => setColumnFilters(prev => prev.filter(f => f.id !== colId));
+  const clearAllFilters = () => { setColumnFilters([]); setGlobalFilter(""); };  
+  const hasActiveFilters = columnFilters.length > 0 || globalFilter !== "";
 
   const pageSizeOptions = [5, 10, 15, 20, 25, 30];
 
@@ -61,6 +88,54 @@ function TanStackTable({
               placeholder={searchPlaceholder}
             />
           </div>
+
+          {/* Filterable Columns */}
+          {filterableColumns.length > 0 && (
+            <div className="flex gap-2 flex-wrap">
+              {filterableColumns.map(fc => {
+                const activeVals = getActiveFilterValues(fc.id);
+                return (
+                  <div key={fc.id} className="relative">
+                    <button
+                      onClick={() => setOpenFilterId(openFilterId === fc.id ? null : fc.id)}
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 border rounded-md text-xs font-medium transition-colors duration-150 ${
+                        activeVals.length > 0
+                          ? "border-blue-500 bg-blue-50 text-blue-700"
+                          : "border-gray-300 bg-white text-gray-600 hover:bg-gray-50"
+                      }`}
+                    >
+                      <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z" />
+                      </svg>
+                      {fc.title}
+                      {activeVals.length > 0 && (
+                        <span className="ml-1 bg-blue-500 text-white rounded-full h-4 w-4 flex items-center justify-center text-xs">{activeVals.length}</span>
+                      )}
+                    </button>
+                    {openFilterId === fc.id && (
+                      <div className="absolute left-0 mt-1 z-30 bg-white border border-gray-200 rounded-lg shadow-lg p-3 min-w-max">
+                        <p className="text-xs font-semibold text-gray-500 uppercase mb-2">{fc.title}</p>
+                        {fc.options.map(opt => (
+                          <label key={opt.value} className="flex items-center gap-2 py-1 cursor-pointer text-sm text-gray-700 hover:text-gray-900">
+                            <input
+                              type="checkbox"
+                              checked={activeVals.includes(opt.value)}
+                              onChange={() => toggleFilterValue(fc.id, opt.value)}
+                              className="rounded border-gray-300 text-blue-600"
+                            />
+                            {opt.label}
+                          </label>
+                        ))}
+                        {activeVals.length > 0 && (
+                          <button onClick={() => clearFilter(fc.id)} className="mt-2 text-xs text-red-500 hover:text-red-700">Clear</button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
 
           {/* Extra Filters (optional) */}
           {extraFilters && <div className="flex gap-2 flex-wrap">{extraFilters}</div>}
@@ -95,6 +170,20 @@ function TanStackTable({
                 </div>
               )}
             </div>
+
+            {/* Reset all filters */}
+            {hasActiveFilters && (
+              <button
+                onClick={clearAllFilters}
+                className="inline-flex items-center px-3 py-2 border border-red-300 shadow-sm text-sm leading-4 font-medium rounded-md text-red-600 bg-white hover:bg-red-50 focus:outline-none transition-colors duration-150"
+                title="Clear all filters"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                Reset
+              </button>
+            )}
 
             {/* Refresh */}
             {onRefresh && (
