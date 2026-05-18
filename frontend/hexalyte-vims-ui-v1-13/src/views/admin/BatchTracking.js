@@ -234,7 +234,7 @@ function BatchTracking() {
                   <button
                     key={t.key}
                     onClick={() => setTab(t.key)}
-                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all duration-200 focus:outline-none ${
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold whitespace-nowrap transition-all duration-200 focus:outline-none ${
                       tab === t.key
                         ? t.key === "expiring"
                           ? "bg-orange-500 text-white shadow-sm"
