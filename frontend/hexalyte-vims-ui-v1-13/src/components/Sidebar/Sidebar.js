@@ -734,6 +734,7 @@ export default function Sidebar() {
               </SidebarSection>
 
               <SidebarSection title="Sales">
+                <SidebarItem to="/admin/sales" text="Sales" icon="fas fa-chart-line" isActive={isActive("/admin/sales")} />
                 <SidebarItem to="/admin/quotations" text="Quotations" icon="fas fa-file-invoice" isActive={isActive("/admin/quotations")} />
               </SidebarSection>
 
