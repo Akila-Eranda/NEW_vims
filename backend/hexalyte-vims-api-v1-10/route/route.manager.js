@@ -24,6 +24,12 @@ const pnlRoute = require('./v1/pnl.route')
 const paymentRoute = require('./v1/payment.route')
 const salesRouteRoute = require('./v1/salesroute.route')
 const outstandingRoute = require('./v1/outstanding.route')
+const brandRoute = require('./v1/brand.route')
+const batchRoute = require('./v1/batch.route')
+const quotationRoute = require('./v1/quotation.route')
+const vehicleRoute = require('./v1/vehicle.route')
+const cashbookRoute = require('./v1/cashbook.route')
+const salesRepRoute = require('./v1/salesrep.route')
 
 const routeManager = (app) => {
     // API V1 Routes
@@ -53,6 +59,12 @@ const routeManager = (app) => {
     app.use('/v1/payments', paymentRoute)
     app.use('/v1/salesroutes', salesRouteRoute)
     app.use('/v1/outstanding', outstandingRoute)
+    app.use('/v1/brands', brandRoute)
+    app.use('/v1/batches', batchRoute)
+    app.use('/v1/quotations', quotationRoute)
+    app.use('/v1/fleet', vehicleRoute)
+    app.use('/v1/cashbook', cashbookRoute)
+    app.use('/v1/salesrep', salesRepRoute)
 }
 
 module.exports = routeManager;
