@@ -385,14 +385,14 @@ function BatchTracking() {
 
       {/* Add Batch Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50 p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.3 }}
-            className="relative w-11/12 lg:w-3/5 my-6 mx-auto max-w-3xl"
+            className="relative w-full max-w-3xl max-h-[90vh] flex flex-col"
           >
-            <div className="bg-white rounded-xl shadow-2xl overflow-hidden">
+            <div className="bg-white rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
 
               {/* Header */}
               <div className="bg-gradient-to-r from-orange-500 to-yellow-500 px-6 py-4 flex items-center justify-between">
@@ -413,7 +413,7 @@ function BatchTracking() {
               </div>
 
               {/* Content */}
-              <div className="p-6">
+              <div className="p-6 overflow-y-auto flex-1">
                 <h4 className="text-lg font-semibold text-gray-700 mb-4 flex items-center">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
