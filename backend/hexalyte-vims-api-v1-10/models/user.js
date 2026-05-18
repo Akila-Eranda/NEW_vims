@@ -22,6 +22,10 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE'
       });
+      user.hasMany(models.customer, { foreignKey: 'SalesRepID', as: 'assignedCustomers' });
+      user.hasMany(models.salesorder, { foreignKey: 'SalesRepID', as: 'repOrders' });
+      user.hasMany(models.salesroute, { foreignKey: 'AssignedRepID', as: 'routes' });
+      user.hasMany(models.payment, { foreignKey: 'CollectedBy', as: 'collectedPayments' });
     }
   }
   user.init({

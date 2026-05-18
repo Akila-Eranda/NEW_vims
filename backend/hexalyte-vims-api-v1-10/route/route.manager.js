@@ -21,6 +21,9 @@ const transferRoutes = require('./v1/transfer.route')
 const returnOrderRoutes = require('./v1/returnorder.route')
 const dashboardRoute = require('./v1/dashboard.route')
 const pnlRoute = require('./v1/pnl.route')
+const paymentRoute = require('./v1/payment.route')
+const salesRouteRoute = require('./v1/salesroute.route')
+const outstandingRoute = require('./v1/outstanding.route')
 
 const routeManager = (app) => {
     // API V1 Routes
@@ -47,6 +50,9 @@ const routeManager = (app) => {
     app.use('/v1/return', returnOrderRoutes)
     app.use('/v1/dashboard', dashboardRoute)
     app.use('/v1/pnl', pnlRoute)
+    app.use('/v1/payments', paymentRoute)
+    app.use('/v1/salesroutes', salesRouteRoute)
+    app.use('/v1/outstanding', outstandingRoute)
 }
 
 module.exports = routeManager;

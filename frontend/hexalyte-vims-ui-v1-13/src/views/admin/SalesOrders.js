@@ -592,6 +592,20 @@ function SalesOrders() {
       sortable: true,
     },
     {
+      name: "Mode",
+      selector: row => {
+        const modeColors = { Cash: "bg-green-100 text-green-700", Credit: "bg-orange-100 text-orange-700", Cheque: "bg-blue-100 text-blue-700", BankTransfer: "bg-purple-100 text-purple-700" };
+        return row.PaymentMode ? <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${modeColors[row.PaymentMode] || 'bg-gray-100 text-gray-600'}`}>{row.PaymentMode}</span> : <span className="text-gray-300">—</span>;
+      },
+    },
+    {
+      name: "Balance",
+      selector: row => {
+        const bal = parseFloat(row.TotalAmount || 0) - parseFloat(row.PaidAmount || 0);
+        return bal > 0 ? <span className="font-semibold text-red-500">Rs. {bal.toLocaleString()}</span> : <span className="text-green-500 font-medium">Paid</span>;
+      },
+    },
+    {
       name: "Actions",
       cell: row => (
         <div className="flex space-x-2">

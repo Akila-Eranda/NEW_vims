@@ -31,6 +31,9 @@ import Discounts from "views/admin/Discounts"
 import OrderHistory from "views/admin/OrderHistory";
 import WarehouseStockTransfer from "views/admin/WarehouseStockTransfer";
 import ReturnOrders from "views/admin/ReturnOrders";
+import PaymentCollection from "views/admin/PaymentCollection";
+import SalesRoutes from "views/admin/SalesRoutes";
+import OutstandingReport from "views/admin/OutstandingReport";
 
 export default function Admin() {
   return (
@@ -62,6 +65,9 @@ export default function Admin() {
             <Route path="/admin/settings" exact component={Settings} />
             <Route path="/admin/tables" exact component={Tables} /> */}
             <Route path="/admin/order-history" exact component={OrderHistory} />
+            <Route path="/admin/payment-collection" exact component={PaymentCollection} />
+            <Route path="/admin/sales-routes" exact component={SalesRoutes} />
+            <Route path="/admin/outstanding-report" exact component={OutstandingReport} />
             <Redirect from="/admin" to="/admin/dashboard" />
           </Switch>
           <FooterAdmin />

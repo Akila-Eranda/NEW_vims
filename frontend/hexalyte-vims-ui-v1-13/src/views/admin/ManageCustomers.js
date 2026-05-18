@@ -339,15 +339,25 @@ function ManageCustomers() {
       grow: 2,
     },
     {
+      name: "Type",
+      cell: row => {
+        const colors = { Retailer: "bg-blue-50 text-blue-700", Wholesaler: "bg-green-50 text-green-700", Agent: "bg-purple-50 text-purple-700", Direct: "bg-orange-50 text-orange-700" };
+        return row.CustomerType
+          ? <span className={`px-2 py-1 rounded-full text-xs font-semibold ${colors[row.CustomerType] || 'bg-gray-100 text-gray-600'}`}>{row.CustomerType}</span>
+          : <span className="text-gray-300 text-xs">—</span>;
+      },
+    },
+    {
+      name: "Credit Limit",
+      cell: row => row.CreditLimit > 0
+        ? <span className="font-medium text-gray-700">Rs. {parseFloat(row.CreditLimit).toLocaleString()}</span>
+        : <span className="text-gray-300 text-xs">None</span>,
+    },
+    {
       name: "Status",
       cell: row => (
-
-        row.isActive ? <div className="px-3 py-1 rounded-md bg-blue-50 text-blue-700 font-medium text-sm">
-          Active
-        </div> : <div className="px-3 py-1 rounded-md bg-red-50 text-red-700 font-medium text-sm">
-          Inactive
-        </div>
-
+        row.isActive ? <div className="px-3 py-1 rounded-md bg-blue-50 text-blue-700 font-medium text-sm">Active</div>
+          : <div className="px-3 py-1 rounded-md bg-red-50 text-red-700 font-medium text-sm">Inactive</div>
       ),
     },
     {

@@ -64,6 +64,14 @@ module.exports = (sequelize, DataTypes) => {
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE'
     },
+    WholesalePrice: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: true
+    },
+    AgentPrice: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: true
+    },
     isActive: {
       type: DataTypes.BOOLEAN,
       allowNull: true

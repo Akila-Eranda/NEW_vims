@@ -21,7 +21,9 @@ module.exports = (sequelize, DataTypes) => {
       salesorder.belongsTo(models.customer, { foreignKey: "CustomerID", as: 'customer' });
 
       salesorder.hasMany(models.returnorders, { foreignKey: 'SalesOrderID' })
-
+      salesorder.belongsTo(models.user, { foreignKey: 'SalesRepID', as: 'salesRep' });
+      salesorder.belongsTo(models.salesroute, { foreignKey: 'RouteID', as: 'route' });
+      salesorder.hasMany(models.payment, { foreignKey: 'OrderID', as: 'payments' });
     }
   }
   salesorder.init({
@@ -51,6 +53,28 @@ module.exports = (sequelize, DataTypes) => {
     },
     isActive: {
       type: DataTypes.BOOLEAN,
+      allowNull: true
+    },
+    SalesRepID: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    PaymentMode: {
+      type: DataTypes.ENUM('Cash', 'Credit', 'Cheque', 'BankTransfer'),
+      defaultValue: 'Cash',
+      allowNull: true
+    },
+    DueDate: {
+      type: DataTypes.DATE,
+      allowNull: true
+    },
+    PaidAmount: {
+      type: DataTypes.DECIMAL(12, 2),
+      defaultValue: 0,
+      allowNull: true
+    },
+    RouteID: {
+      type: DataTypes.INTEGER,
       allowNull: true
     }
   }, {

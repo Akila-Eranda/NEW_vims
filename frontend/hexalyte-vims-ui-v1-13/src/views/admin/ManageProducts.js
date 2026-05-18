@@ -194,6 +194,8 @@ function ManageProducts() {
       Description: productData.Description,
       SellingPrice: productData.SellingPrice,
       BuyingPrice: productData.BuyingPrice,
+      WholesalePrice: productData.WholesalePrice || null,
+      AgentPrice: productData.AgentPrice || null,
       QuantityInStock: productData.QuantityInStock,
       SupplierID: productData.SupplierID,
       CategoryID: productData.CategoryID,
@@ -395,14 +397,21 @@ function ManageProducts() {
       grow: 2,
     },
     {
-      name: "Price",
+      name: "Retail Price",
       selector: row => formatPrice(row.SellingPrice),
       sortable: true,
       sortFunction: (a, b) => a.SellingPrice - b.SellingPrice,
-      style: {
-        fontWeight: 500,
-        color: "#1f2937",
-      },
+      style: { fontWeight: 500, color: "#1f2937" },
+    },
+    {
+      name: "Wholesale",
+      selector: row => row.WholesalePrice ? formatPrice(row.WholesalePrice) : <span className="text-gray-300 text-xs">—</span>,
+      style: { color: "#059669" },
+    },
+    {
+      name: "Agent",
+      selector: row => row.AgentPrice ? formatPrice(row.AgentPrice) : <span className="text-gray-300 text-xs">—</span>,
+      style: { color: "#7c3aed" },
     },
     {
       name: "Stock",

@@ -12,6 +12,9 @@ function CustomerAddModal({ setOpenModal, addCustomer }) {
         Phone: "",
         Email: "",
         Note: "",
+        CustomerType: "Retailer",
+        CreditLimit: 0,
+        CreditDays: 0,
         AddressID: null
     });
 
@@ -242,6 +245,33 @@ function CustomerAddModal({ setOpenModal, addCustomer }) {
                                             {errors.Email && (
                                                 <p className="text-red-500 text-xs mt-1">{errors.Email}</p>
                                             )}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* S&D Section */}
+                                <div className="mb-6">
+                                    <h4 className="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                                        Distribution Settings
+                                    </h4>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Customer Type</label>
+                                            <select name="CustomerType" value={newCustomer.CustomerType} onChange={handleCustomerChange} className="block w-full px-3 py-2.5 text-base border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 rounded-lg">
+                                                <option>Retailer</option>
+                                                <option>Wholesaler</option>
+                                                <option>Agent</option>
+                                                <option>Direct</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Credit Limit (Rs.)</label>
+                                            <input type="number" name="CreditLimit" min="0" step="0.01" value={newCustomer.CreditLimit} onChange={handleCustomerChange} className="block w-full px-3 py-2.5 text-base border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 rounded-lg" placeholder="0.00" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Credit Days</label>
+                                            <input type="number" name="CreditDays" min="0" value={newCustomer.CreditDays} onChange={handleCustomerChange} className="block w-full px-3 py-2.5 text-base border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 rounded-lg" placeholder="0" />
                                         </div>
                                     </div>
                                 </div>

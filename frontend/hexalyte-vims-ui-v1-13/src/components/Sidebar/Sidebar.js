@@ -728,6 +728,27 @@ export default function Sidebar() {
                 />
               </SidebarSection>
 
+              <SidebarSection title="Distribution">
+                <SidebarItem
+                  to="/admin/payment-collection"
+                  text="Payment Collection"
+                  icon="fas fa-money-bill-wave"
+                  isActive={isActive("/admin/payment-collection")}
+                />
+                <SidebarItem
+                  to="/admin/sales-routes"
+                  text="Sales Routes"
+                  icon="fas fa-route"
+                  isActive={isActive("/admin/sales-routes")}
+                />
+                <SidebarItem
+                  to="/admin/outstanding-report"
+                  text="Outstanding Report"
+                  icon="fas fa-exclamation-circle"
+                  isActive={isActive("/admin/outstanding-report")}
+                />
+              </SidebarSection>
+
               <SidebarSection title="Reports">
                 <SidebarItem
                   to="/admin/reports"
