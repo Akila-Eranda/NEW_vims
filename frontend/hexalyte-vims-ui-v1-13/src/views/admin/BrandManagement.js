@@ -9,115 +9,403 @@ function BrandManagement() {
   const [showModal, setShowModal] = useState(false);
   const [editBrand, setEditBrand] = useState(null);
   const [form, setForm] = useState({ Name: "", Description: "" });
-  const [search, setSearch] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const api = createAxiosInstance();
-
-  const load = async () => {
+  async function loadBrands() {
     try {
       setIsLoading(true);
+      const api = createAxiosInstance();
       const res = await api.get("brands");
       setBrands(res.data.brands || []);
-    } catch (e) { console.error(e); }
-    finally { setIsLoading(false); }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  useEffect(() => { loadBrands(); }, []);
+
+  const openAdd = () => {
+    setEditBrand(null);
+    setForm({ Name: "", Description: "" });
+    setShowModal(true);
   };
 
-  useEffect(() => { load(); }, []);
+  const openEdit = (b) => {
+    setEditBrand(b);
+    setForm({ Name: b.Name, Description: b.Description || "" });
+    setShowModal(true);
+  };
 
-  const openAdd = () => { setEditBrand(null); setForm({ Name: "", Description: "" }); setShowModal(true); };
-  const openEdit = (b) => { setEditBrand(b); setForm({ Name: b.Name, Description: b.Description || "" }); setShowModal(true); };
-
-  const handleSave = async () => {
-    if (!form.Name.trim()) return Swal.fire("Warning", "Brand name is required", "warning");
+  async function handleSave() {
+    if (!form.Name.trim()) {
+      Swal.fire({ title: "Warning", text: "Brand name is required", icon: "warning" });
+      return;
+    }
     try {
+      const api = createAxiosInstance();
       if (editBrand) {
         await api.put(`brands/${editBrand.BrandID}`, form);
-        Swal.fire("Updated!", "Brand updated successfully", "success");
+        Swal.fire({ title: "Updated!", text: "Brand updated successfully", icon: "success" });
       } else {
         await api.post("brands", form);
-        Swal.fire("Created!", "Brand added successfully", "success");
+        Swal.fire({ title: "Created!", text: "Brand added successfully", icon: "success" });
       }
       setShowModal(false);
-      load();
-    } catch (e) { Swal.fire("Error", e.message, "error"); }
-  };
-
-  const handleDelete = async (b) => {
-    const result = await Swal.fire({ title: `Delete "${b.Name}"?`, icon: "warning", showCancelButton: true, confirmButtonColor: "#d33" });
-    if (result.isConfirmed) {
-      try { await api.delete(`brands/${b.BrandID}`); load(); Swal.fire("Deleted!", "", "success"); }
-      catch (e) { Swal.fire("Error", e.message, "error"); }
+      loadBrands();
+    } catch (e) {
+      Swal.fire({ title: "Error", text: "Operation failed", icon: "error" });
     }
-  };
+  }
 
-  const filtered = brands.filter(b => b.Name?.toLowerCase().includes(search.toLowerCase()));
+  async function handleDelete(b) {
+    Swal.fire({
+      title: "Confirm Delete",
+      text: `Are you sure you want to delete the brand: ${b.Name}?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const api = createAxiosInstance();
+          await api.delete(`brands/${b.BrandID}`);
+          Swal.fire({ title: "Deleted!", text: "Brand has been deleted successfully", icon: "success" });
+          loadBrands();
+        } catch (e) {
+          Swal.fire({ title: "Error", text: "Failed to delete brand", icon: "error" });
+        }
+      }
+    });
+  }
+
+  const filteredBrands = brands.filter(b =>
+    (b.Name && b.Name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+    (b.Description && b.Description.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+
+  const customStyles = {
+    headRow: {
+      style: {
+        backgroundColor: "#f9fafb",
+        borderRadius: "8px 8px 0 0",
+        border: "none",
+        minHeight: "56px",
+      },
+    },
+    headCells: {
+      style: {
+        color: "#4b5563",
+        fontSize: "14px",
+        fontWeight: "600",
+        paddingLeft: "16px",
+        paddingRight: "16px",
+      },
+    },
+    rows: {
+      style: {
+        fontSize: "14px",
+        minHeight: "60px",
+        borderBottom: "1px solid #f3f4f6",
+        "&:last-of-type": { borderBottom: "none" },
+      },
+      highlightOnHoverStyle: {
+        backgroundColor: "#f3f4f6",
+        cursor: "pointer",
+        transitionDuration: "0.15s",
+        transitionProperty: "background-color",
+        borderBottomColor: "#f3f4f6",
+        outlineColor: "transparent",
+      },
+    },
+    pagination: {
+      style: {
+        border: "none",
+        backgroundColor: "#fff",
+        borderRadius: "0 0 8px 8px",
+        boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+      },
+    },
+  };
 
   const columns = [
-    { name: "ID", selector: row => row.BrandID, width: "80px", sortable: true },
-    { name: "Brand Name", selector: row => <span className="font-semibold text-gray-800">{row.Name}</span>, sortable: true, grow: 2 },
-    { name: "Description", selector: row => row.Description || <span className="text-gray-300">—</span>, grow: 3 },
-    { name: "Products", selector: row => <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium">{row.products?.length || 0}</span> },
     {
-      name: "Actions", cell: row => (
-        <div className="flex gap-2">
-          <button onClick={() => openEdit(row)} className="bg-indigo-500 text-white rounded-full p-2 hover:bg-indigo-600">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+      name: "ID",
+      selector: row => row.BrandID,
+      sortable: true,
+      width: "80px",
+      style: { fontWeight: 600, color: "#1f2937" },
+    },
+    {
+      name: "Brand",
+      cell: row => (
+        <div className="flex items-center py-2">
+          <div className="h-10 w-10 flex-shrink-0 rounded-md bg-gradient-to-r from-purple-100 to-pink-100 flex items-center justify-center text-purple-700 font-bold text-lg border border-purple-200">
+            {row.Name ? row.Name.charAt(0).toUpperCase() : "B"}
+          </div>
+          <div className="ml-4">
+            <div className="font-medium text-gray-900">{row.Name}</div>
+            <div className="text-gray-500 text-sm truncate max-w-xs">
+              {row.Description || "No description"}
+            </div>
+          </div>
+        </div>
+      ),
+      sortable: true,
+      sortFunction: (a, b) => a.Name.localeCompare(b.Name),
+      grow: 3,
+    },
+    {
+      name: "Products",
+      cell: row => (
+        <span className="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+          {row.products?.length || 0} products
+        </span>
+      ),
+      width: "130px",
+    },
+    {
+      name: "Status",
+      cell: row => (
+        <span className={`px-3 py-1 rounded-full text-xs font-medium ${row.isActive !== false ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}`}>
+          {row.isActive !== false ? "Active" : "Inactive"}
+        </span>
+      ),
+      width: "110px",
+    },
+    {
+      name: "Actions",
+      cell: row => (
+        <div className="flex space-x-2">
+          <button
+            className="bg-indigo-500 text-white rounded-full p-2 hover:bg-indigo-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:ring-opacity-50"
+            onClick={(e) => { e.stopPropagation(); openEdit(row); }}
+            title="Edit Brand"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+            </svg>
           </button>
-          <button onClick={() => handleDelete(row)} className="bg-red-500 text-white rounded-full p-2 hover:bg-red-600">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+          <button
+            className="bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-300 focus:ring-opacity-50"
+            onClick={(e) => { e.stopPropagation(); handleDelete(row); }}
+            title="Delete Brand"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
           </button>
         </div>
-      ), width: "120px"
-    }
+      ),
+      button: true,
+      width: "120px",
+    },
   ];
 
   return (
-    <div className="px-4 md:px-10 mx-auto w-full -m-24">
-      <div className="flex flex-wrap mt-4">
-        <div className="w-full mb-12 px-4">
-          <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-white border-0">
-            <div className="rounded-t bg-white mb-0 px-6 py-6 border-b">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h6 className="text-blueGray-700 text-xl font-bold">Brand Management</h6>
-                  <p className="text-gray-500 text-sm mt-1">Manage product brands</p>
+    <>
+      <div className="w-full min-h-screen p-6">
+        <div className="w-full mx-auto">
+
+          {/* Header */}
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Brand Management</h1>
+              <p className="mt-1 text-sm text-gray-500">Manage your product brands and manufacturers</p>
+            </div>
+            <button
+              onClick={openAdd}
+              className="mt-4 md:mt-0 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              Add New Brand
+            </button>
+          </div>
+
+          {/* Search Bar */}
+          <div className="bg-white p-4 rounded-lg shadow-sm mb-4">
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="relative flex-grow">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+                  </svg>
                 </div>
-                <button onClick={openAdd} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2 text-sm font-medium">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
-                  Add Brand
-                </button>
+                <input
+                  type="text"
+                  className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
+                  placeholder="Search brands by name or description"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
               </div>
-              <div className="mt-4">
-                <input type="text" placeholder="Search brands..." value={search} onChange={e => setSearch(e.target.value)} className="border border-gray-300 rounded-lg px-4 py-2 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-blue-300" />
+              <button
+                onClick={loadBrands}
+                className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="-ml-0.5 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Refresh
+              </button>
+            </div>
+          </div>
+
+          {/* Summary Cards */}
+          <div className="px-0 py-4 bg-gray-50 rounded-lg border border-gray-200 mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 px-4">
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0 p-3 rounded-md bg-purple-100">
+                    <svg className="h-6 w-6 text-purple-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                    </svg>
+                  </div>
+                  <div className="ml-5">
+                    <p className="text-sm font-medium text-gray-500">Total Brands</p>
+                    <h3 className="mt-1 text-xl font-semibold text-gray-900">{brands.length}</h3>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0 p-3 rounded-md bg-green-100">
+                    <svg className="h-6 w-6 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div className="ml-5">
+                    <p className="text-sm font-medium text-gray-500">Active Brands</p>
+                    <h3 className="mt-1 text-xl font-semibold text-gray-900">
+                      {brands.filter(b => b.isActive !== false).length}
+                    </h3>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0 p-3 rounded-md bg-blue-100">
+                    <svg className="h-6 w-6 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                    </svg>
+                  </div>
+                  <div className="ml-5">
+                    <p className="text-sm font-medium text-gray-500">Search Results</p>
+                    <h3 className="mt-1 text-xl font-semibold text-gray-900">{filteredBrands.length}</h3>
+                  </div>
+                </div>
               </div>
             </div>
-            <DataTable columns={columns} data={filtered} pagination progressPending={isLoading} highlightOnHover responsive />
           </div>
+
+          {/* Data Table */}
+          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+            <DataTable
+              columns={columns}
+              data={filteredBrands}
+              customStyles={customStyles}
+              highlightOnHover
+              pointerOnHover
+              pagination
+              paginationPerPage={10}
+              paginationRowsPerPageOptions={[5, 10, 15, 20, 25]}
+              progressPending={isLoading}
+              progressComponent={
+                <div className="flex justify-center items-center h-64">
+                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+                </div>
+              }
+              noDataComponent={
+                <div className="flex flex-col items-center justify-center p-10 text-center">
+                  <svg className="w-16 h-16 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                  </svg>
+                  <p className="mt-4 text-lg font-medium text-gray-500">No brands found</p>
+                  <p className="mt-1 text-sm text-gray-400">Try adjusting your search or add a new brand</p>
+                </div>
+              }
+            />
+          </div>
+
         </div>
       </div>
 
+      {/* Add / Edit Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
-            <h3 className="text-xl font-bold text-gray-800 mb-4">{editBrand ? "Edit Brand" : "Add New Brand"}</h3>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Brand Name *</label>
-                <input type="text" value={form.Name} onChange={e => setForm({ ...form, Name: e.target.value })} className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300" placeholder="e.g. Anchor, Nestlé" />
+        <div className="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+          <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onClick={() => setShowModal(false)} />
+            <span className="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div className="flex items-center mb-4">
+                  <div className="flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-purple-100">
+                    <svg className="h-6 w-6 text-purple-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                    </svg>
+                  </div>
+                  <div className="ml-4">
+                    <h3 className="text-lg leading-6 font-medium text-gray-900">
+                      {editBrand ? "Edit Brand" : "Add New Brand"}
+                    </h3>
+                    <p className="text-sm text-gray-500">
+                      {editBrand ? `Editing: ${editBrand.Name}` : "Create a new product brand"}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Brand Name <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={form.Name}
+                      onChange={e => setForm({ ...form, Name: e.target.value })}
+                      className="focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                      placeholder="e.g. Anchor, Nestlé, Milo"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <textarea
+                      value={form.Description}
+                      onChange={e => setForm({ ...form, Description: e.target.value })}
+                      rows={3}
+                      className="focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                      placeholder="Optional brand description..."
+                    />
+                  </div>
+                </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                <textarea value={form.Description} onChange={e => setForm({ ...form, Description: e.target.value })} rows={3} className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300" placeholder="Optional description..." />
+
+              <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse gap-2">
+                <button
+                  onClick={handleSave}
+                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
+                >
+                  {editBrand ? "Update Brand" : "Add Brand"}
+                </button>
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:w-auto sm:text-sm"
+                >
+                  Cancel
+                </button>
               </div>
-            </div>
-            <div className="flex gap-3 mt-6">
-              <button onClick={handleSave} className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 font-medium">{editBrand ? "Update" : "Create"}</button>
-              <button onClick={() => setShowModal(false)} className="flex-1 bg-gray-100 text-gray-700 py-2 rounded-lg hover:bg-gray-200 font-medium">Cancel</button>
             </div>
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
 
