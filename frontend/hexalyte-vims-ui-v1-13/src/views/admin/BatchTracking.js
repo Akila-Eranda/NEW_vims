@@ -219,113 +219,149 @@ function BatchTracking() {
             </button>
           </div>
 
-          {/* Search & Filter Bar */}
-          <div className="bg-white p-4 rounded-lg shadow-sm mb-0">
-            <div className="flex flex-col lg:flex-row gap-4">
+          {/* ── Advanced Filter Panel ── */}
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm mb-0 overflow-hidden">
 
-              {/* Tab toggle */}
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setTab("expiring")}
-                  className={`inline-flex items-center px-3 py-2 border shadow-sm text-sm leading-4 font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 ${
-                    tab === "expiring" ? "bg-orange-500 border-orange-500 text-white" : "border-gray-300 text-gray-700 bg-white hover:bg-gray-50"
-                  }`}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="-ml-0.5 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  Expiring Soon
-                </button>
-                <button
-                  onClick={() => setTab("product")}
-                  className={`inline-flex items-center px-3 py-2 border shadow-sm text-sm leading-4 font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
-                    tab === "product" ? "bg-blue-600 border-blue-600 text-white" : "border-gray-300 text-gray-700 bg-white hover:bg-gray-50"
-                  }`}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="-ml-0.5 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                  </svg>
-                  By Product
-                </button>
+            {/* Row 1 — main controls */}
+            <div className="px-4 py-3 flex flex-wrap items-center gap-3 border-b border-gray-100">
+
+              {/* Segmented tab control */}
+              <div className="inline-flex bg-gray-100 rounded-lg p-1 gap-0.5">
+                {[
+                  { key: "expiring", label: "Expiring Soon", icon: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" },
+                  { key: "product",  label: "By Product",    icon: "M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" },
+                ].map(t => (
+                  <button
+                    key={t.key}
+                    onClick={() => setTab(t.key)}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all duration-200 focus:outline-none ${
+                      tab === t.key
+                        ? t.key === "expiring"
+                          ? "bg-orange-500 text-white shadow-sm"
+                          : "bg-blue-600 text-white shadow-sm"
+                        : "text-gray-500 hover:text-gray-700 hover:bg-white"
+                    }`}
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={t.icon} />
+                    </svg>
+                    {t.label}
+                  </button>
+                ))}
               </div>
 
-              {/* By-product select */}
-              {tab === "product" && (
-                <div className="flex-grow">
-                  <select
-                    value={selectedProduct}
-                    onChange={e => setSelectedProduct(e.target.value)}
-                    className="focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                  >
-                    <option value="">Select Product...</option>
-                    {products.map(p => (
-                      <option key={p.ProductID} value={p.ProductID}>
-                        {p.Name}{p.SKU ? ` (${p.SKU})` : ""}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
+              {/* Separator */}
+              <div className="h-6 w-px bg-gray-200" />
 
-              <div className="flex items-center gap-2 flex-wrap flex-1">
-                {/* Days pills (expiring tab only) */}
-                {tab === "expiring" && (
-                  <>
-                    <span className="text-sm text-gray-500 whitespace-nowrap">Expiring within:</span>
+              {/* Days filter — expiring tab */}
+              {tab === "expiring" && (
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">Expiring within</span>
+                  <div className="flex gap-1.5">
                     {[7, 14, 30, 60, 90].map(d => (
                       <button
                         key={d}
                         onClick={() => setDaysFilter(d)}
-                        className={`px-3 py-1.5 border shadow-sm text-xs font-medium rounded-md transition-colors duration-200 ${
-                          daysFilter === d ? "bg-orange-500 border-orange-500 text-white" : "border-gray-300 text-gray-700 bg-white hover:bg-gray-50"
+                        className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 focus:outline-none ${
+                          daysFilter === d
+                            ? "bg-orange-500 text-white shadow-sm ring-2 ring-orange-300 ring-offset-1"
+                            : "bg-gray-100 text-gray-500 hover:bg-orange-50 hover:text-orange-600"
                         }`}
                       >
-                        {d} days
+                        {d}d
                       </button>
                     ))}
-                  </>
-                )}
-              </div>
+                  </div>
+                </div>
+              )}
 
-              {/* Action buttons */}
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => { setTab("expiring"); setDaysFilter(30); setSelectedProduct(""); }}
-                  className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-                  title="Clear all filters"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="-ml-0.5 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                  Clear
-                </button>
-                <button
-                  onClick={tab === "expiring" ? loadExpiring : loadByProduct}
-                  className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="-ml-0.5 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                  </svg>
-                  Refresh
-                </button>
-              </div>
+              {/* Product dropdown — product tab */}
+              {tab === "product" && (
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-medium text-gray-400 uppercase tracking-wide whitespace-nowrap">Product</span>
+                  <div className="relative">
+                    <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                    </svg>
+                    <select
+                      value={selectedProduct}
+                      onChange={e => setSelectedProduct(e.target.value)}
+                      className="pl-8 pr-8 py-1.5 text-xs font-medium border border-gray-200 rounded-lg bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400 min-w-[200px] appearance-none"
+                    >
+                      <option value="">Select a product…</option>
+                      {products.map(p => (
+                        <option key={p.ProductID} value={p.ProductID}>
+                          {p.Name}{p.SKU ? ` (${p.SKU})` : ""}
+                        </option>
+                      ))}
+                    </select>
+                    <svg className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+              )}
+
+              {/* Spacer */}
+              <div className="flex-1" />
+
+              {/* Clear */}
+              <button
+                onClick={() => { setTab("expiring"); setDaysFilter(30); setSelectedProduct(""); }}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-red-500 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 hover:text-red-700 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-300"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                Clear
+              </button>
+
+              {/* Refresh */}
+              <button
+                onClick={tab === "expiring" ? loadExpiring : loadByProduct}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-200"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Refresh
+              </button>
             </div>
 
-            {/* Active filters display */}
-            <div className="mt-3 flex flex-wrap gap-2">
-              <span className="text-sm text-gray-500">Active filters:</span>
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                View: {tab === "expiring" ? "Expiring Soon" : "By Product"}
+            {/* Row 2 — active filter chips */}
+            <div className="px-4 py-2 bg-gray-50/60 flex items-center gap-2 flex-wrap min-h-[36px]">
+              <span className="text-xs font-medium text-gray-400 uppercase tracking-wide mr-1">Active</span>
+
+              {/* View chip */}
+              <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold ring-1 ${
+                tab === "expiring" ? "bg-orange-50 text-orange-700 ring-orange-200" : "bg-blue-50 text-blue-700 ring-blue-200"
+              }`}>
+                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={tab === "expiring" ? "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" : "M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"} />
+                </svg>
+                {tab === "expiring" ? "Expiring Soon" : "By Product"}
               </span>
+
+              {/* Days chip */}
               {tab === "expiring" && (
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-orange-50 text-orange-700 ring-1 ring-orange-200">
+                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
                   Within {daysFilter} days
                 </span>
               )}
+
+              {/* Product chip */}
               {tab === "product" && selectedProduct && (
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                  Product: {products.find(p => String(p.ProductID) === String(selectedProduct))?.Name || selectedProduct}
-                  <button onClick={() => setSelectedProduct("")} className="ml-1 text-green-600 hover:text-green-800">×</button>
+                <span className="inline-flex items-center gap-1 pl-2.5 pr-1 py-1 rounded-lg text-xs font-semibold bg-blue-50 text-blue-700 ring-1 ring-blue-200">
+                  <svg className="w-3 h-3 mr-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                  </svg>
+                  {products.find(p => String(p.ProductID) === String(selectedProduct))?.Name || selectedProduct}
+                  <button onClick={() => setSelectedProduct("")} className="ml-0.5 p-0.5 rounded hover:bg-blue-100 hover:text-blue-900 transition-colors">
+                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                  </button>
                 </span>
               )}
             </div>
