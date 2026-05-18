@@ -728,25 +728,28 @@ export default function Sidebar() {
                 />
               </SidebarSection>
 
+              <SidebarSection title="Products">
+                <SidebarItem to="/admin/brands" text="Brand Management" icon="fas fa-tag" isActive={isActive("/admin/brands")} />
+                <SidebarItem to="/admin/batch-tracking" text="Batch & Expiry" icon="fas fa-boxes" isActive={isActive("/admin/batch-tracking")} />
+              </SidebarSection>
+
+              <SidebarSection title="Sales">
+                <SidebarItem to="/admin/quotations" text="Quotations" icon="fas fa-file-invoice" isActive={isActive("/admin/quotations")} />
+              </SidebarSection>
+
               <SidebarSection title="Distribution">
-                <SidebarItem
-                  to="/admin/payment-collection"
-                  text="Payment Collection"
-                  icon="fas fa-money-bill-wave"
-                  isActive={isActive("/admin/payment-collection")}
-                />
-                <SidebarItem
-                  to="/admin/sales-routes"
-                  text="Sales Routes"
-                  icon="fas fa-route"
-                  isActive={isActive("/admin/sales-routes")}
-                />
-                <SidebarItem
-                  to="/admin/outstanding-report"
-                  text="Outstanding Report"
-                  icon="fas fa-exclamation-circle"
-                  isActive={isActive("/admin/outstanding-report")}
-                />
+                <SidebarItem to="/admin/payment-collection" text="Payment Collection" icon="fas fa-money-bill-wave" isActive={isActive("/admin/payment-collection")} />
+                <SidebarItem to="/admin/sales-routes" text="Sales Routes" icon="fas fa-route" isActive={isActive("/admin/sales-routes")} />
+                <SidebarItem to="/admin/fleet" text="Fleet Management" icon="fas fa-truck" isActive={isActive("/admin/fleet")} />
+                <SidebarItem to="/admin/outstanding-report" text="Outstanding Report" icon="fas fa-exclamation-circle" isActive={isActive("/admin/outstanding-report")} />
+              </SidebarSection>
+
+              <SidebarSection title="Accounts">
+                <SidebarItem to="/admin/cashbook" text="Cash Book" icon="fas fa-book" isActive={isActive("/admin/cashbook")} />
+              </SidebarSection>
+
+              <SidebarSection title="HR & Sales Reps">
+                <SidebarItem to="/admin/sales-rep" text="Sales Rep & Targets" icon="fas fa-user-tie" isActive={isActive("/admin/sales-rep")} />
               </SidebarSection>
 
               <SidebarSection title="Reports">

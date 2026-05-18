@@ -34,6 +34,12 @@ import ReturnOrders from "views/admin/ReturnOrders";
 import PaymentCollection from "views/admin/PaymentCollection";
 import SalesRoutes from "views/admin/SalesRoutes";
 import OutstandingReport from "views/admin/OutstandingReport";
+import BrandManagement from "views/admin/BrandManagement";
+import BatchTracking from "views/admin/BatchTracking";
+import Quotations from "views/admin/Quotations";
+import FleetManagement from "views/admin/FleetManagement";
+import CashBook from "views/admin/CashBook";
+import SalesRepManagement from "views/admin/SalesRepManagement";
 
 export default function Admin() {
   return (
@@ -68,6 +74,12 @@ export default function Admin() {
             <Route path="/admin/payment-collection" exact component={PaymentCollection} />
             <Route path="/admin/sales-routes" exact component={SalesRoutes} />
             <Route path="/admin/outstanding-report" exact component={OutstandingReport} />
+            <Route path="/admin/brands" exact component={BrandManagement} />
+            <Route path="/admin/batch-tracking" exact component={BatchTracking} />
+            <Route path="/admin/quotations" exact component={Quotations} />
+            <Route path="/admin/fleet" exact component={FleetManagement} />
+            <Route path="/admin/cashbook" exact component={CashBook} />
+            <Route path="/admin/sales-rep" exact component={SalesRepManagement} />
             <Redirect from="/admin" to="/admin/dashboard" />
           </Switch>
           <FooterAdmin />
